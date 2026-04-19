@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Список книг</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f5f5f5;
+        }
+        .book {
+            background: white;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .book h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        .book p {
+            margin: 5px 0;
+            color: #666;
+        }
+        .genre {
+            display: inline-block;
+            background: #e0e0e0;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Библиотека</h1>
+    {% for book in books %}
+        <div class="book">
+            <h3>{{ book.title }}</h3>
+            <p><strong>Автор:</strong> {{ book.author.name }}</p>
+            <p><strong>Дата публикации:</strong> {{ book.published_date }}</p>
+            <p><strong>Описание:</strong> {{ book.description }}</p>
+            <p><strong>Жанры:</strong>
+                {% for genre in book.genre.all %}
+                    <span class="genre">{{ genre.name }}</span>
+                {% empty %}
+                    <span>Жанры не указаны</span>
+                {% endfor %}
+            </p>
+        </div>
+    {% empty %}
+        <p>Книг пока нет.</p>
+    {% endfor %}
+</body>
+</html>
