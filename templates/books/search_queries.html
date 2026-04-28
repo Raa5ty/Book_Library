@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Поисковые запросы - Библиотека</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        h2 {
+            color: #555;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+            margin-top: 30px;
+        }
+        h3 {
+            color: #666;
+            margin: 15px 0 10px 0;
+        }
+        .stats {
+            background: #e8f4f8;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+        .stat-card {
+            text-align: center;
+            padding: 10px;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+        .query-section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .query-description {
+            background: #f0f0f0;
+            padding: 10px;
+            border-left: 4px solid #007bff;
+            margin-bottom: 15px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .book-item {
+            background: #fafafa;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border-left: 3px solid #28a745;
+        }
+        .book-title {
+            font-weight: bold;
+            font-size: 16px;
+            color: #333;
+        }
+        .book-detail {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .genre {
+            display: inline-block;
+            background: #e0e0e0;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-right: 5px;
+            margin-top: 5px;
+        }
+        .rating {
+            display: inline-block;
+            background: #ffc107;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .store-item {
+            background: #fafafa;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .store-name {
+            font-weight: bold;
+        }
+        .book-count {
+            background: #28a745;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        .no-data {
+            color: #999;
+            font-style: italic;
+            padding: 10px;
+        }
+        .nav-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .nav-link:hover {
+            background: #0056b3;
+        }
+        .optimization-badge {
+            display: inline-block;
+            background: #17a2b8;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 15px;
+            font-size: 11px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>📊 Django ORM: Сложные запросы и оптимизация</h1>
+    
+    <div style="text-align: center; margin-bottom: 20px;">
+        <a href="/" class="nav-link">← На главную (список книг)</a>
+        <a href="/admin/" class="nav-link" style="background: #6c757d;">Админ-панель</a>
+    </div>
+    
+    <!-- Статистика -->
+    <div class="stats">
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.total_books }}</div>
+            <div class="stat-label">Книг</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.total_stores }}</div>
+            <div class="stat-label">Магазинов</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.total_publishers }}</div>
+            <div class="stat-label">Издательств</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.total_reviews }}</div>
+            <div class="stat-label">Отзывов</div>
+        </div>
+    </div>
+    
+    <!-- Запрос 1 -->
+    <div class="query-section">
+        <h2>📚 Запрос 1: Книги издательств из России</h2>
+        <div class="query-description">
+            <strong>ORM Запрос:</strong> Book.objects.filter(publisher__country='Россия').select_related('author', 'publisher').prefetch_related('genre')<br>
+            <span class="optimization-badge">✅ Оптимизация: select_related() для publisher и author</span>
+        </div>
+        {% for book in books_by_country %}
+            <div class="book-item">
+                <div class="book-title">{{ book.title }}</div>
+                <div class="book-detail">
+                    Автор: {{ book.author.name }} | 
+                    Издательство: {{ book.publisher.name }} ({{ book.publisher.country }})
+                </div>
+                <div>
+                    {% for genre in book.genre.all %}
+                        <span class="genre">{{ genre.name }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        {% empty %}
+            <div class="no-data">Книги не найдены</div>
+        {% endfor %}
+    </div>
+    
+    <!-- Запрос 2 -->
+    <div class="query-section">
+        <h2>🏪 Запрос 2: Книги, продающиеся в магазинах Москвы</h2>
+        <div class="query-description">
+            <strong>ORM Запрос:</strong> Book.objects.filter(stores__city='Москва').select_related('author', 'publisher').prefetch_related('genre', 'stores').distinct()<br>
+            <span class="optimization-badge">✅ Оптимизация: prefetch_related() для stores (ManyToMany)</span>
+        </div>
+        {% for book in books_in_moscow %}
+            <div class="book-item">
+                <div class="book-title">{{ book.title }}</div>
+                <div class="book-detail">Автор: {{ book.author.name }}</div>
+                <div>
+                    {% for genre in book.genre.all %}
+                        <span class="genre">{{ genre.name }}</span>
+                    {% endfor %}
+                    <span style="font-size: 12px; color: #28a745;">
+                        📍 Магазины: 
+                        {% for store in book.stores.all|slice:":3" %}
+                            {{ store.name }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </span>
+                </div>
+            </div>
+        {% empty %}
+            <div class="no-data">Книги не найдены</div>
+        {% endfor %}
+    </div>
+    
+    <!-- Запрос 3 -->
+    <div class="query-section">
+        <h2>⭐ Запрос 3: Книги со средней оценкой выше 4.5</h2>
+        <div class="query-description">
+            <strong>ORM Запрос:</strong> Book.objects.annotate(avg_rating=Avg('reviews__rating')).filter(avg_rating__gt=4.5).select_related('author', 'publisher').prefetch_related('reviews')<br>
+            <span class="optimization-badge">✅ Оптимизация: prefetch_related() для reviews + агрегация Avg</span>
+        </div>
+        {% for book in high_rated_books %}
+            <div class="book-item">
+                <div class="book-title">
+                    {{ book.title }}
+                    {% with avg=book.reviews.all|dictsort:"rating" %}
+                        <span class="rating">⭐ {{ book.reviews.all|length }} отзывов</span>
+                    {% endwith %}
+                </div>
+                <div class="book-detail">Автор: {{ book.author.name }}</div>
+                <div class="book-detail">
+                    {% for review in book.reviews.all|slice:":2" %}
+                        💬 "{{ review.comment|truncatechars:50 }}" ({{ review.rating }}/5)<br>
+                    {% endfor %}
+                </div>
+            </div>
+        {% empty %}
+            <div class="no-data">Книги со средним рейтингом выше 4.5 не найдены</div>
+        {% endfor %}
+    </div>
+    
+    <!-- Запрос 4 -->
+    <div class="query-section">
+        <h2>📊 Запрос 4: Количество книг в каждом магазине</h2>
+        <div class="query-description">
+            <strong>ORM Запрос:</strong> Store.objects.annotate(book_count=Count('books')).order_by('-book_count')<br>
+            <span class="optimization-badge">✅ Агрегация Count и сортировка</span>
+        </div>
+        {% for store in stores_with_book_count %}
+            <div class="store-item">
+                <span class="store-name">{{ store.name }}</span>
+                <span class="book-count">{{ store.book_count }} книг</span>
+            </div>
+        {% empty %}
+            <div class="no-data">Магазины не найдены</div>
+        {% endfor %}
+    </div>
+    
+    <!-- Запрос 5 -->
+    <div class="query-section">
+        <h2>🕒 Запрос 5: Магазины с книгами после 2010 года (сортировка по количеству книг)</h2>
+        <div class="query-description">
+            <strong>ORM Запрос:</strong> Store.objects.filter(books__published_date__year__gt=2010).annotate(book_count=Count('books')).distinct().order_by('-book_count')<br>
+            <span class="optimization-badge">✅ Фильтрация по дате + агрегация + distinct()</span>
+        </div>
+        {% for store in stores_with_recent_books %}
+            <div class="store-item">
+                <span class="store-name">{{ store.name }} ({{ store.city }})</span>
+                <span class="book-count">📖 {{ store.book_count }} книг после 2010</span>
+            </div>
+        {% empty %}
+            <div class="no-data">Магазины не найдены</div>
+        {% endfor %}
+    </div>
+    
+    <div style="text-align: center; margin-top: 30px; padding: 20px; background: #e9ecef; border-radius: 8px;">
+        <h3>🚀 Оптимизация запросов</h3>
+        <p>
+            ✅ <strong>select_related()</strong> - использован для ForeignKey (author, publisher) - сокращает количество запросов с N+1 до 1<br>
+            ✅ <strong>prefetch_related()</strong> - использован для ManyToMany (genre, stores) и обратных связей (reviews)<br>
+            ✅ <strong>annotate() + Count/Avg</strong> - для агрегации данных на уровне БД<br>
+            ✅ <strong>distinct()</strong> - для устранения дублей при ManyToMany фильтрации
+        </p>
+    </div>
+</body>
+</html>

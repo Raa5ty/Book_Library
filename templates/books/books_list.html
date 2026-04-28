@@ -9,6 +9,27 @@
             margin: 40px;
             background-color: #f5f5f5;
         }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .nav-button {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
         .book {
             background: white;
             padding: 15px;
@@ -32,22 +53,59 @@
             font-size: 12px;
             margin-right: 5px;
         }
+        .store {
+            display: inline-block;
+            background: #d4edda;
+            color: #155724;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+        .rating {
+            display: inline-block;
+            background: #ffc107;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
-    <h1>Библиотека</h1>
+    <h1>📚 Библиотека</h1>
+    
+    <div class="nav-button">
+        <a href="/search/" class="btn">🔍 Перейти к сложным запросам</a>
+    </div>
+    
     {% for book in books %}
         <div class="book">
             <h3>{{ book.title }}</h3>
             <p><strong>Автор:</strong> {{ book.author.name }}</p>
+            <p><strong>Издательство:</strong> {{ book.publisher.name|default:"Не указано" }} ({{ book.publisher.country|default:"-" }})</p>
             <p><strong>Дата публикации:</strong> {{ book.published_date }}</p>
-            <p><strong>Описание:</strong> {{ book.description }}</p>
+            <p><strong>Описание:</strong> {{ book.description|default:"Нет описания" }}</p>
             <p><strong>Жанры:</strong>
                 {% for genre in book.genre.all %}
                     <span class="genre">{{ genre.name }}</span>
                 {% empty %}
                     <span>Жанры не указаны</span>
                 {% endfor %}
+            </p>
+            <p><strong>Магазины:</strong>
+                {% for store in book.stores.all %}
+                    <span class="store">{{ store.name }} ({{ store.city }})</span>
+                {% empty %}
+                    <span>Не продаётся</span>
+                {% endfor %}
+            </p>
+            <p><strong>Средний рейтинг:</strong>
+                {% if book.reviews_count > 0 %}
+                    <span class="rating">⭐ {{ book.avg_rating|floatformat:1 }} ({{ book.reviews_count }} отзывов)</span>
+                {% else %}
+                    <span>Нет отзывов</span>
+                {% endif %}
             </p>
         </div>
     {% empty %}
